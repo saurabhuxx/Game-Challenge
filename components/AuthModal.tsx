@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { CITIES, REGIONS } from '../constants';
-import { LogIn } from 'lucide-react';
+import { LogIn, X } from 'lucide-react';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -15,40 +15,37 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSubmit }) => {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4">
-      <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in-95">
+      <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in-95 relative">
+        <button 
+          onClick={onClose}
+          className="absolute -top-12 right-0 p-2 text-zinc-500 hover:text-white transition-colors"
+          aria-label="Close"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
         <div className="text-center space-y-4">
           <div className="inline-block p-3 bg-yellow-500/10 rounded-2xl mb-4">
             <div className="w-12 h-12 flex items-center justify-center bg-yellow-500 rounded-xl text-black">
               <LogIn className="w-6 h-6" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold font-syncopate tracking-tight">Save your progress.</h2>
+          <h2 className="text-3xl font-bold font-syncopate tracking-tight">Great Start!</h2>
           <p className="text-zinc-500 text-sm max-w-xs mx-auto">
-            You've completed your first few trials! Sign in to save your score and continue your journey.
+            You played your first round. Tell us who you are to save your score and keep playing!
           </p>
         </div>
 
         <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-3xl space-y-6 shadow-2xl">
-          <button 
-            className="w-full py-4 bg-white text-black font-bold rounded-xl flex items-center justify-center gap-3 hover:bg-zinc-200 transition-colors"
-          >
-            <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
-            Sign in with Google
-          </button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zinc-900"></div></div>
-            <div className="relative flex justify-center text-xs uppercase"><span className="bg-zinc-950 px-2 text-zinc-600">Your Profile</span></div>
-          </div>
-
           <div className="space-y-4">
             <div>
-              <label className="text-[10px] text-zinc-500 uppercase font-bold block mb-1">Nickname</label>
+              <label className="text-[10px] text-zinc-500 uppercase font-bold block mb-1">Your Name</label>
               <input 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your name..."
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors"
+                aria-required="true"
               />
             </div>
             
@@ -76,13 +73,21 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSubmit }) => {
             </div>
           </div>
 
-          <button 
-            disabled={!name.trim()}
-            onClick={() => onSubmit(name, city, region)}
-            className="w-full py-4 bg-yellow-500 text-black font-syncopate text-xs font-bold tracking-widest rounded-xl hover:bg-yellow-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            SAVE & START
-          </button>
+          <div className="flex flex-col gap-3">
+            <button 
+              disabled={!name.trim()}
+              onClick={() => onSubmit(name, city, region)}
+              className="w-full py-4 bg-yellow-500 text-black font-syncopate text-xs font-bold tracking-widest rounded-xl hover:bg-yellow-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              SAVE PROGRESS
+            </button>
+            <button 
+              onClick={onClose}
+              className="w-full py-2 text-zinc-600 text-[10px] uppercase font-bold hover:text-zinc-400 transition-colors"
+            >
+              I'll do this later
+            </button>
+          </div>
         </div>
       </div>
     </div>

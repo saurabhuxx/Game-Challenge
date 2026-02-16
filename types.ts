@@ -6,6 +6,7 @@ export interface User {
   city?: string;
   region?: string;
   totalKarma: number;
+  hasDismissedAuth?: boolean;
 }
 
 export interface Dilemma {

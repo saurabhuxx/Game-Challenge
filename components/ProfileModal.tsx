@@ -31,7 +31,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ userId, userName, log, onCl
           </div>
           
           <div className="space-y-1">
-            <h2 className="text-2xl font-bold font-syncopate tracking-tight">GAME SUMMARY</h2>
+            <h2 className="text-2xl font-bold font-syncopate tracking-tight">YOUR PROGRESS</h2>
             <p className="text-xs text-zinc-600 font-mono uppercase tracking-[0.3em]">Player: {userName}</p>
           </div>
 
@@ -39,10 +39,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ userId, userName, log, onCl
             <div className="p-5 bg-yellow-500/5 border border-yellow-500/20 rounded-2xl relative overflow-hidden group">
               <Sparkles className="absolute -top-1 -right-1 w-12 h-12 text-yellow-500/10 group-hover:scale-125 transition-transform" />
               <h4 className="text-[10px] font-bold text-yellow-500 uppercase mb-2 flex items-center gap-2">
-                <Sparkles className="w-3 h-3" /> Best Choice
+                <Sparkles className="w-3 h-3" /> Your Kindest Act
               </h4>
               <p className="text-sm text-zinc-200 italic mb-2">
-                {analytics?.virtuous ? `"${analytics.virtuous.dilemma}"` : "No virtuous acts recorded yet."}
+                {analytics?.virtuous ? `"${analytics.virtuous.dilemma}"` : "No special acts recorded yet."}
               </p>
               {analytics?.virtuous && (
                 <div className="flex items-center gap-2 text-xs text-yellow-500/70 font-mono">
@@ -54,10 +54,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ userId, userName, log, onCl
             <div className="p-5 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl relative overflow-hidden group">
               <Skull className="absolute -top-1 -right-1 w-12 h-12 text-emerald-500/10 group-hover:scale-125 transition-transform" />
               <h4 className="text-[10px] font-bold text-emerald-500 uppercase mb-2 flex items-center gap-2">
-                <Skull className="w-3 h-3" /> Worst Choice
+                <Skull className="w-3 h-3" /> Your Biggest Mistake
               </h4>
               <p className="text-sm text-zinc-200 italic mb-2">
-                {analytics?.darkest ? `"${analytics.darkest.dilemma}"` : "No mistakes made yet."}
+                {analytics?.darkest ? `"${analytics.darkest.dilemma}"` : "No mistakes found yet!"}
               </p>
               {analytics?.darkest && (
                 <div className="flex items-center gap-2 text-xs text-emerald-500/70 font-mono">
@@ -72,7 +72,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ userId, userName, log, onCl
               onClick={onClose}
               className="w-full py-4 bg-zinc-900 text-zinc-400 font-syncopate text-xs font-bold tracking-widest rounded-xl hover:text-white transition-all"
             >
-              CLOSE SUMMARY
+              CLOSE
             </button>
           </div>
         </div>
