@@ -52,7 +52,7 @@ const App: React.FC = () => {
   
   const radarChartRef = useRef<HTMLCanvasElement>(null);
 
-  // --- PRE-FETCHING LOGIC (Optimization for Deploy) ---
+  // --- PRE-FETCHING LOGIC ---
   const prefetchDilemma = useCallback(async () => {
     try {
       const dilemma = await moralEngine.generateDilemma();
@@ -77,13 +77,13 @@ const App: React.FC = () => {
       setUser(guest);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(guest));
     }
-    prefetchDilemma(); // Get first one ready
+    prefetchDilemma();
   }, [prefetchDilemma]);
 
   const typeWriterEffect = useCallback((text: string) => {
     setTypedFeedback('');
     let i = 0;
-    const speed = 15; // Even faster for responsive feel
+    const speed = 15;
     const interval = setInterval(() => {
       setTypedFeedback((prev) => prev + text.charAt(i));
       i++;
@@ -99,7 +99,6 @@ const App: React.FC = () => {
       return;
     }
 
-    // Use pre-fetched dilemma for ZERO latency UI
     const dilemmaToUse = nextDilemma;
     setModalState(prev => ({ 
       ...prev, 
@@ -109,7 +108,6 @@ const App: React.FC = () => {
       gitaImageUrl: null 
     }));
 
-    // Start fetching the dilemma for the *next* turn immediately
     prefetchDilemma();
   };
 
@@ -122,7 +120,6 @@ const App: React.FC = () => {
       setModalState(prev => ({ ...prev, lastEvaluation: evaluation, isEvaluating: false, isImageLoading: true }));
       typeWriterEffect(evaluation.feedback);
       
-      // Async image generation - doesn't block the reflection text
       moralEngine.generateVerseImage(evaluation.gitaImagePrompt)
         .then(url => setModalState(prev => ({ ...prev, gitaImageUrl: url, isImageLoading: false })))
         .catch(() => setModalState(prev => ({ ...prev, isImageLoading: false })));
@@ -185,7 +182,6 @@ const App: React.FC = () => {
     if (nextTile >= currentMax) setShowEndGame(true);
   };
 
-  // --- ANALYTICS ARCHETYPE ---
   const archetype = useMemo(() => {
     if (gameState.history.length === 0) return "The Unwritten";
     const avg = gameState.history.reduce((acc, curr) => ({
@@ -206,8 +202,8 @@ const App: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col lg:flex-row p-4 lg:p-6 gap-6 bg-[#050505] overflow-hidden ${user?.totalKarma && user.totalKarma < -40 ? 'glitch-state' : ''}`}>
-      <main className="w-full lg:w-[70%] flex flex-col gap-6 relative overflow-hidden">
-        <header className="flex items-center justify-between">
+      <main role="main" className="w-full lg:w-[70%] flex flex-col gap-6 relative overflow-hidden">
+        <header role="banner" className="flex items-center justify-between">
           <div className="flex flex-col">
             <h1 className="text-4xl font-bold font-syncopate tracking-widest text-cyber-gradient leading-none">MOKSHA</h1>
             <div className="flex items-center gap-2 mt-2">
@@ -215,12 +211,12 @@ const App: React.FC = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex flex-col items-end mr-4">
+          <nav aria-label="Quick stats and profile" className="flex items-center gap-3">
+            <div className="hidden sm:flex flex-col items-end mr-4" aria-label="Energy status">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mb-1 flex items-center gap-1">
                 <Zap className={`w-3 h-3 ${gameState.stamina < 30 ? 'text-red-500 animate-pulse' : 'text-yellow-500'}`} /> ENERGY
               </span>
-              <div className="w-32 h-1.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
+              <div className="w-32 h-1.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800" role="progressbar" aria-valuenow={gameState.stamina} aria-valuemin={0} aria-valuemax={100}>
                 <div 
                   className={`h-full transition-all duration-500 ${gameState.stamina < 30 ? 'bg-red-500' : 'bg-yellow-500'}`}
                   style={{ width: `${gameState.stamina}%` }}
@@ -231,31 +227,31 @@ const App: React.FC = () => {
             <button 
               onClick={() => setShowProfile(true)} 
               className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-yellow-500/50 transition-all flex items-center gap-2"
-              title="Soul Summary"
+              aria-label="View lifetime soul summary"
             >
               <BookOpen className="w-5 h-5 text-yellow-500" />
               <span className="hidden md:block text-[10px] font-syncopate font-bold text-zinc-500 uppercase tracking-widest">Summary</span>
             </button>
 
-            <button onClick={() => setShowLeaderboard(true)} className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-cyan-500/50 transition-all">
+            <button onClick={() => setShowLeaderboard(true)} className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-cyan-500/50 transition-all" aria-label="View leaderboard">
               <Trophy className="w-5 h-5 text-cyan-400" />
             </button>
-            <div className="flex flex-col items-end border-l border-zinc-800 pl-4">
+            <div className="flex flex-col items-end border-l border-zinc-800 pl-4" aria-label="Current user session">
               <span className="text-[10px] text-zinc-500 uppercase tracking-widest">Seeker</span>
               <span className="font-bold text-base flex items-center gap-2 text-yellow-500">
                 {user?.name}
                 <UserIcon className="w-4 h-4 text-zinc-400" />
               </span>
             </div>
-          </div>
+          </nav>
         </header>
 
-        <div className="relative flex-1 bg-zinc-950 rounded-[2.5rem] border border-zinc-900 shadow-[0_0_60px_rgba(0,0,0,1)] p-8 flex items-center justify-center overflow-hidden">
+        <section aria-label="Sacred Game Board" className="relative flex-1 bg-zinc-950 rounded-[2.5rem] border border-zinc-900 shadow-[0_0_60px_rgba(0,0,0,1)] p-8 flex items-center justify-center overflow-hidden">
           <Board currentTile={gameState.currentTile} shieldActive={gameState.shieldActive} shieldTiles={SHIELD_TILES} isExpanded={gameState.isGridExpanded} />
-        </div>
+        </section>
 
-        <footer className="flex items-center justify-between p-6 bg-zinc-950/80 border border-zinc-900 rounded-[2rem] backdrop-blur-xl relative z-10">
-          <div className="flex gap-10">
+        <footer role="contentinfo" className="flex items-center justify-between p-6 bg-zinc-950/80 border border-zinc-900 rounded-[2rem] backdrop-blur-xl relative z-10">
+          <div className="flex gap-10" aria-live="polite">
             <div className="flex flex-col">
               <span className="text-[10px] text-zinc-600 uppercase font-bold tracking-[0.2em] mb-1">Karma Index</span>
               <span className="text-2xl font-bold text-yellow-500 font-syncopate leading-none">{user?.totalKarma}</span>
@@ -268,29 +264,30 @@ const App: React.FC = () => {
           <button
             onClick={handleSeekPath}
             disabled={gameState.stamina < 15 || gameState.currentTile >= (gameState.isGridExpanded ? 110 : 100)}
+            aria-label={gameState.stamina < 15 ? 'Energy depleted, resting' : 'Choose your next moral path'}
             className={`px-16 py-5 rounded-2xl font-syncopate text-xs font-bold tracking-[0.3em] transition-all flex items-center gap-4
               ${gameState.stamina < 15 ? 'opacity-30 grayscale cursor-not-allowed border border-zinc-800' : 'bg-yellow-500 text-black hover:scale-[1.03] active:scale-95 shadow-[0_0_40px_rgba(234,179,8,0.2)]'}
             `}
           >
             {gameState.stamina < 15 ? 'RESTING...' : 'CHOOSE PATH'}
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </button>
         </footer>
       </main>
 
-      <aside className="w-full lg:w-[30%] flex flex-col gap-6 h-full overflow-hidden">
-        <div className="h-[45%] flex-shrink-0">
+      <aside role="complementary" className="w-full lg:w-[30%] flex flex-col gap-6 h-full overflow-hidden">
+        <section className="h-[45%] flex-shrink-0" aria-label="Other active seekers">
           <LivePlayers />
-        </div>
-        <div className="flex-1 overflow-hidden min-h-[300px]">
+        </section>
+        <section className="flex-1 overflow-hidden min-h-[300px]" aria-label="Spiritual journey logs">
           <AuditLog history={gameState.history} />
-        </div>
+        </section>
       </aside>
 
       {modalState.showDilemma && (
         <DilemmaModal 
           dilemma={modalState.currentDilemma} 
-          isLoading={!modalState.currentDilemma} // Only true if prefetch failed
+          isLoading={!modalState.currentDilemma}
           isEvaluating={modalState.isEvaluating}
           evaluation={modalState.lastEvaluation}
           gitaImageUrl={modalState.gitaImageUrl}
@@ -304,12 +301,12 @@ const App: React.FC = () => {
       )}
 
       {showEndGame && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/98 backdrop-blur-3xl p-6 animate-in fade-in duration-1000">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/98 backdrop-blur-3xl p-6 animate-in fade-in duration-1000" role="alertdialog" aria-modal="true" aria-labelledby="enlightenment-title">
           <div className="max-w-lg w-full bg-zinc-950 border border-zinc-800 rounded-[3rem] p-10 text-center space-y-8">
-            <h2 className="text-3xl font-bold font-syncopate text-yellow-500 uppercase">Moksha Attained</h2>
+            <h2 id="enlightenment-title" className="text-3xl font-bold font-syncopate text-yellow-500 uppercase">Moksha Attained</h2>
             <div className="bg-zinc-900/50 p-6 rounded-3xl border border-zinc-800 aspect-square flex items-center justify-center relative">
                <div className="absolute inset-0 flex items-center justify-center opacity-10">
-                 <Zap className="w-48 h-48 text-yellow-500 animate-pulse" />
+                 <Zap className="w-48 h-48 text-yellow-500 animate-pulse" aria-hidden="true" />
                </div>
                <div className="relative z-10 space-y-4">
                  <p className="text-[10px] text-zinc-500 uppercase tracking-[0.4em]">Final Signature</p>

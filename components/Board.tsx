@@ -43,17 +43,19 @@ const Board: React.FC<BoardProps> = ({ currentTile, shieldActive, shieldTiles, i
         tiles.push(
           <div 
             key={tileNumber} 
+            role="gridcell"
+            aria-label={`Tile ${tileNumber}${isCurrent ? ', your current location' : ''}${hasShield ? ', contains a divine shield' : ''}`}
             className={`relative flex items-center justify-center border border-zinc-900/40 text-[10px] h-full w-full 
               ${isCurrent ? 'bg-zinc-900/80 border-cyan-500/50' : 'bg-black/40'}
               transition-all duration-700
             `}
           >
-            <span className="absolute top-1 left-1 text-zinc-800 font-mono text-[9px] font-bold leading-none select-none">
+            <span className="absolute top-1 left-1 text-zinc-800 font-mono text-[9px] font-bold leading-none select-none" aria-hidden="true">
               {tileNumber}
             </span>
             
             {hasShield && !isCurrent && (
-              <Shield className="w-5 h-5 text-cyan-500/5 animate-pulse" />
+              <Shield className="w-5 h-5 text-cyan-500/5 animate-pulse" aria-hidden="true" />
             )}
 
             {isCurrent && (
@@ -75,6 +77,8 @@ const Board: React.FC<BoardProps> = ({ currentTile, shieldActive, shieldTiles, i
 
   return (
     <div 
+      role="grid"
+      aria-multiselectable="false"
       className="relative w-full h-full max-w-[650px] border-[6px] border-zinc-900/80 rounded-2xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,1)] bg-zinc-950 transition-all duration-1000"
       style={{ aspectRatio: `10 / ${TOTAL_ROWS}` }}
     >
@@ -82,7 +86,7 @@ const Board: React.FC<BoardProps> = ({ currentTile, shieldActive, shieldTiles, i
         {renderTiles()}
       </div>
       
-      <svg viewBox={`0 0 100 ${TOTAL_ROWS * 10}`} className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+      <svg viewBox={`0 0 100 ${TOTAL_ROWS * 10}`} className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" aria-hidden="true">
         <defs>
           <linearGradient id="ladder-grad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#fbbf24" />

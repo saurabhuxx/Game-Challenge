@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cyber-Moksha: A narrative-driven moral dilemma RPG exploring ethics through AI-powered storytelling." />
     <title>Cyber-Moksha: Ethics Over Fate</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -61,7 +62,12 @@
         background-clip: text;
       }
 
-      /* Module 2: Glitch Effect */
+      /* Focus management for accessibility */
+      :focus-visible {
+        outline: 2px solid #fbbf24;
+        outline-offset: 4px;
+      }
+
       .glitch-state {
         animation: glitch-skew 0.5s infinite linear alternate-reverse;
         filter: hue-rotate(90deg) contrast(1.2);
