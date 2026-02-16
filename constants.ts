@@ -1,9 +1,8 @@
-
-export const CITIES = ['Gurugram', 'Bengaluru', 'Mumbai', 'Hyderabad', 'Pune', 'Noida'];
-export const REGIONS = ['North India', 'South India', 'West India', 'East India', 'Central India'];
+export const CITIES = ['Varanasi', 'Hampi', 'Rishikesh', 'Mysuru', 'Pushkar', 'Gokarna'];
+export const REGIONS = ['North', 'South', 'West', 'East', 'Central'];
 
 export const COLLEAGUES = [
-  'Brek', 'Jonathan', 'Cindy', 'Kishan', 'Dhairyadev'
+  'Aria', 'Kavi', 'Sia', 'Rohan', 'Mira'
 ];
 
 export const SHIELD_TILES = [15, 42, 73, 88];
@@ -12,11 +11,11 @@ export const GRID_SIZE = 10;
 export const TOTAL_TILES = 100;
 
 export const CORPORATE_SPEAK = [
-  "I will circle back on this after aligning with all cross-functional stakeholders.",
-  "Let's take this offline to ensure we're following the standard operating procedure.",
-  "I appreciate the feedback and will socialize this with the leadership team for consensus.",
-  "We need to leverage our core competencies to find a mutually beneficial synergy.",
-  "I'm currently bandwidth-constrained but will prioritize a deep-dive into this next quarter."
+  "I will stand by the truth, even if it is difficult.",
+  "Kindness is a bridge that connects us all.",
+  "To serve others is the highest calling we have.",
+  "Respect is the foundation of every true connection.",
+  "Honesty shines brighter than any gold."
 ];
 
 export const LADDERS = [
@@ -30,7 +29,6 @@ export const LADDERS = [
   { start: 71, end: 91 }
 ];
 
-// Single "King Cobra" snake for high drama
 export const SNAKES = [
   { start: 98, end: 13 }
 ];

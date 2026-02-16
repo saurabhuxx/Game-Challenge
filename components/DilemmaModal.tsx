@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Dilemma, KarmicEvaluation } from '../types';
-import { X, Send, Users, ChevronRight, Loader2, ShieldCheck, Star, ArrowRightCircle } from 'lucide-react';
+import { X, Send, Users, ChevronRight, Loader2, ShieldCheck, Star, ArrowRightCircle, Sparkles, Quote } from 'lucide-react';
 import { COLLEAGUES, CORPORATE_SPEAK } from '../constants';
 
 interface DilemmaModalProps {
@@ -9,6 +8,9 @@ interface DilemmaModalProps {
   isLoading: boolean;
   isEvaluating: boolean;
   evaluation: KarmicEvaluation | null;
+  gitaImageUrl: string | null;
+  isImageLoading: boolean;
+  typedFeedback?: string;
   onClose: () => void;
   onSubmit: (response: string, usedLifeline: boolean) => void;
   onContinue: () => void;
@@ -16,7 +18,7 @@ interface DilemmaModalProps {
 }
 
 const DilemmaModal: React.FC<DilemmaModalProps> = ({ 
-  dilemma, isLoading, isEvaluating, evaluation, onClose, onSubmit, onContinue, hasLifeline 
+  dilemma, isLoading, isEvaluating, evaluation, gitaImageUrl, isImageLoading, typedFeedback, onClose, onSubmit, onContinue, hasLifeline 
 }) => {
   const [input, setInput] = useState('');
   const [showColleagues, setShowColleagues] = useState(false);
@@ -30,13 +32,13 @@ const DilemmaModal: React.FC<DilemmaModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
-      <div className="bg-zinc-950 border border-zinc-800 rounded-3xl w-full max-w-2xl min-h-[400px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,1)] flex flex-col animate-in zoom-in-95 transition-all">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4 overflow-y-auto">
+      <div className="bg-zinc-950 border border-zinc-800 rounded-[2.5rem] w-full max-w-2xl my-auto overflow-hidden shadow-[0_0_100px_rgba(0,0,0,1)] flex flex-col animate-in zoom-in-95 transition-all">
         <div className="p-6 border-b border-zinc-900 flex justify-between items-center bg-zinc-900/10">
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${isLoading || isEvaluating ? 'bg-cyan-500 animate-spin' : 'bg-yellow-500 animate-pulse'}`} />
-            <h3 className="font-syncopate text-xs tracking-[0.2em] font-bold">
-              {evaluation ? 'THE LESSON' : 'YOUR CHOICE'}
+            <h3 className="font-syncopate text-[10px] tracking-[0.2em] font-bold uppercase text-zinc-400">
+              {evaluation ? 'SOUL REFLECTION' : 'A MOMENT OF CHOICE'}
             </h3>
           </div>
           {!evaluation && (
@@ -47,74 +49,120 @@ const DilemmaModal: React.FC<DilemmaModalProps> = ({
         </div>
 
         {isLoading ? (
-          <div className="flex-1 flex flex-col items-center justify-center space-y-4 p-8">
+          <div className="flex-1 flex flex-col items-center justify-center space-y-4 p-12">
             <Loader2 className="w-10 h-10 text-yellow-500 animate-spin" />
-            <p className="font-syncopate text-[10px] tracking-widest text-zinc-500 uppercase animate-pulse">Wait, the story is coming...</p>
+            <p className="font-syncopate text-[10px] tracking-widest text-zinc-500 uppercase animate-pulse text-center">Weaving the threads of destiny...</p>
           </div>
         ) : evaluation ? (
-          <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex-1 p-6 lg:p-10 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-h-[85vh] overflow-y-auto custom-scrollbar">
             <div className="text-center space-y-4">
-              <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-full text-xl font-bold font-syncopate shadow-lg
-                ${evaluation.karma_score > 0 ? 'bg-yellow-500 text-black shadow-yellow-500/20' : evaluation.karma_score < 0 ? 'bg-red-500 text-white shadow-red-500/20' : 'bg-zinc-800 text-zinc-400'}
+              <div className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-lg font-bold font-syncopate shadow-lg border
+                ${evaluation.karma_score > 0 ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-500 shadow-yellow-500/5' : evaluation.karma_score < 0 ? 'bg-red-500/10 border-red-500/30 text-red-500 shadow-red-500/5' : 'bg-zinc-800 text-zinc-400 border-zinc-700'}
               `}>
-                <Star className="w-6 h-6 fill-current" />
-                {evaluation.karma_score > 0 ? `+${evaluation.karma_score}` : evaluation.karma_score} POINTS
+                <Star className="w-5 h-5 fill-current" />
+                {evaluation.karma_score > 0 ? `+${evaluation.karma_score}` : evaluation.karma_score} KARMA
               </div>
-              <p className="text-xl text-zinc-100 font-medium leading-relaxed italic px-4">
-                "{evaluation.feedback}"
+              <p className="text-xl text-zinc-100 font-medium leading-relaxed italic px-4 min-h-[3rem] flex items-center justify-center text-center">
+                "{typedFeedback || evaluation.feedback}"
               </p>
             </div>
 
+            {/* Gita Wisdom Card */}
+            <div className="relative group bg-zinc-900/40 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl transition-all hover:border-yellow-500/40">
+              <div className="absolute top-0 right-0 p-4 z-10">
+                <div className="bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 rounded-full px-3 py-1 flex items-center gap-1.5 shadow-xl">
+                  <Sparkles className="w-3 h-3 text-yellow-500" />
+                  <span className="text-[9px] font-bold text-yellow-500 font-syncopate tracking-widest uppercase">Ancient Wisdom</span>
+                </div>
+              </div>
+
+              {/* Image Section */}
+              <div className="aspect-video w-full bg-zinc-950 relative overflow-hidden">
+                {isImageLoading ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/80 backdrop-blur-sm z-20 space-y-3">
+                    <Loader2 className="w-8 h-8 text-yellow-500/50 animate-spin" />
+                    <span className="text-[9px] font-syncopate text-zinc-600 tracking-widest uppercase animate-pulse">Manifesting Scene...</span>
+                  </div>
+                ) : gitaImageUrl ? (
+                  <img src={gitaImageUrl} alt="Bhagavad Gita Scene" className="w-full h-full object-cover animate-in fade-in zoom-in-110 duration-1000" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/20">
+                    <Quote className="w-12 h-12 text-zinc-800 opacity-20" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-60"></div>
+              </div>
+
+              {/* Text Section */}
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Quote className="w-4 h-4 text-yellow-500/40 rotate-180" />
+                    <span className="text-[10px] font-bold text-zinc-500 font-mono tracking-tighter uppercase">{evaluation.gitaCitation}</span>
+                  </div>
+                  <p className="text-base text-zinc-300 font-serif leading-relaxed line-clamp-4 italic">
+                    {evaluation.gitaVerse}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-zinc-900/50 rounded-2xl border border-zinc-800 text-center">
-                <span className="text-[10px] text-zinc-500 uppercase block mb-1">Board Move</span>
-                <span className={`text-lg font-bold ${evaluation.board_movement > 0 ? 'text-yellow-500' : 'text-red-400'}`}>
+              <div className="p-4 bg-zinc-900/30 rounded-2xl border border-zinc-800/50 text-center transition-all hover:bg-zinc-900/50">
+                <span className="text-[9px] text-zinc-500 uppercase block mb-1 font-syncopate tracking-widest">Board Move</span>
+                <span className={`text-lg font-bold font-syncopate ${evaluation.board_movement > 0 ? 'text-yellow-500' : 'text-red-400'}`}>
                   {evaluation.board_movement > 0 ? `+${evaluation.board_movement}` : evaluation.board_movement} Steps
                 </span>
               </div>
-              <div className="p-4 bg-zinc-900/50 rounded-2xl border border-zinc-800 text-center">
-                <span className="text-[10px] text-zinc-500 uppercase block mb-1">Moral Impact</span>
-                <span className="text-lg font-bold text-cyan-400">
-                  {evaluation.karma_score > 0 ? 'Excellent' : evaluation.karma_score < 0 ? 'Poor' : 'Neutral'}
+              <div className="p-4 bg-zinc-900/30 rounded-2xl border border-zinc-800/50 text-center transition-all hover:bg-zinc-900/50">
+                <span className="text-[9px] text-zinc-500 uppercase block mb-1 font-syncopate tracking-widest">Nature</span>
+                <span className="text-lg font-bold text-cyan-400 uppercase tracking-widest font-syncopate">
+                  {evaluation.karma_score > 0 ? 'Virtuous' : evaluation.karma_score < 0 ? 'Selfish' : 'Neutral'}
                 </span>
               </div>
             </div>
 
             <button
               onClick={onContinue}
-              className="w-full py-5 bg-zinc-100 text-black font-syncopate text-sm font-bold tracking-widest rounded-2xl hover:bg-white transition-all flex items-center justify-center gap-3 shadow-2xl"
+              className="w-full py-5 bg-yellow-500 text-black font-syncopate text-xs font-bold tracking-[0.3em] rounded-2xl hover:bg-yellow-400 hover:scale-[1.01] transition-all flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(234,179,8,0.2)] active:scale-95"
             >
-              CONTINUE GAME
+              CONTINUE JOURNEY
               <ArrowRightCircle className="w-5 h-5" />
             </button>
           </div>
         ) : dilemma ? (
-          <div className="p-8 space-y-6 animate-in fade-in duration-500">
-            <div className="space-y-2">
-              <span className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">The Story</span>
-              <p className="text-xl text-zinc-100 font-medium leading-relaxed">
+          <div className="p-8 lg:p-12 space-y-8 animate-in fade-in duration-700">
+            <div className="space-y-4">
+              <div className="inline-block px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-[9px] font-bold text-zinc-500 font-syncopate tracking-widest uppercase">
+                Packet ID: 0x{Math.random().toString(16).substr(2, 4).toUpperCase()}
+              </div>
+              <p className="text-2xl lg:text-3xl text-zinc-100 font-medium leading-tight tracking-tight">
                 {dilemma.scenario}
               </p>
             </div>
 
-            <div className="bg-zinc-900/30 border border-zinc-900/50 p-4 rounded-xl flex items-start gap-3">
-              <ShieldCheck className="w-5 h-5 text-zinc-600 shrink-0 mt-0.5" />
-              <p className="text-sm text-zinc-500 italic">
+            <div className="bg-zinc-900/30 border border-zinc-800/50 p-5 rounded-2xl flex items-center gap-4 group">
+              <div className="p-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-600 group-hover:text-yellow-500/50 transition-colors">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <p className="text-sm text-zinc-400 italic font-bold uppercase tracking-widest">
                 {dilemma.context}
               </p>
             </div>
 
             <div className="space-y-4">
-              <div>
+              <div className="relative group">
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={isEvaluating}
-                  placeholder="What would you do? Write your answer here..."
-                  className="w-full h-32 bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 text-zinc-200 focus:outline-none focus:border-yellow-500 transition-colors resize-none placeholder:text-zinc-700 disabled:opacity-50"
+                  placeholder="What is your command..."
+                  className="w-full h-32 bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5 text-zinc-200 focus:outline-none focus:border-yellow-500/50 transition-all resize-none placeholder:text-zinc-700 disabled:opacity-50 text-lg leading-relaxed shadow-inner"
                   aria-label="Your choice description"
                 />
-                <p className="text-[9px] text-zinc-700 mt-2 uppercase tracking-tighter">Please be kind and helpful!</p>
+                <div className="absolute bottom-4 right-4 text-[10px] font-mono text-zinc-700 opacity-0 group-focus-within:opacity-100 transition-opacity">
+                  CTRL + ENTER TO SUBMIT
+                </div>
               </div>
               
               <div className="flex flex-wrap gap-4 items-center justify-between">
@@ -123,46 +171,45 @@ const DilemmaModal: React.FC<DilemmaModalProps> = ({
                     <button
                       onClick={() => setShowColleagues(!showColleagues)}
                       disabled={isEvaluating}
-                      className="flex items-center gap-2 text-xs font-bold text-zinc-500 hover:text-white transition-colors disabled:opacity-30"
+                      className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 hover:text-white transition-colors disabled:opacity-30 uppercase tracking-[0.2em] font-syncopate"
                     >
                       <Users className="w-4 h-4" />
-                      ASK A FRIEND
+                      Social Link
                     </button>
                     {showColleagues && (
-                      <div className="absolute bottom-full mb-2 left-0 w-48 bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl overflow-hidden animate-in slide-in-from-bottom-2">
+                      <div className="absolute bottom-full mb-3 left-0 w-56 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden animate-in slide-in-from-bottom-4 zoom-in-95">
+                        <div className="p-3 border-b border-zinc-900 bg-zinc-900/20">
+                          <span className="text-[9px] font-bold text-zinc-600 font-syncopate uppercase tracking-widest">Query Network</span>
+                        </div>
                         {COLLEAGUES.map(c => (
                           <button
                             key={c}
                             onClick={() => handleTagColleague(c)}
-                            className="w-full text-left px-4 py-2 text-xs text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors flex justify-between items-center"
+                            className="w-full text-left px-4 py-3 text-xs text-zinc-400 hover:bg-yellow-500/10 hover:text-yellow-500 transition-all flex justify-between items-center uppercase font-bold tracking-tight border-b border-zinc-900/50 last:border-0"
                           >
                             {c}
-                            <ChevronRight className="w-3 h-3" />
+                            <ChevronRight className="w-3 h-3 opacity-30" />
                           </button>
                         ))}
                       </div>
                     )}
                   </div>
                 ) : (
-                  <span className="text-[10px] text-zinc-600 font-bold uppercase">Help Used</span>
+                  <span className="text-[10px] text-zinc-700 font-bold uppercase font-syncopate tracking-widest">Link Used</span>
                 )}
 
                 <button
                   disabled={!input.trim() || isEvaluating}
                   onClick={() => onSubmit(input, !!selectedColleague)}
-                  className="px-8 py-3 bg-yellow-500 text-black font-syncopate text-xs font-bold tracking-widest rounded-xl hover:bg-yellow-400 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  className="px-12 py-4 bg-yellow-500 text-black font-syncopate text-xs font-bold tracking-widest rounded-2xl hover:bg-yellow-400 hover:scale-[1.05] active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group shadow-[0_0_30px_rgba(234,179,8,0.2)]"
                 >
-                  {isEvaluating ? 'THINKING...' : 'SUBMIT'}
-                  <Send className={`w-4 h-4 ${isEvaluating ? '' : 'group-hover:translate-x-1'} transition-transform`} />
+                  {isEvaluating ? 'REFLECTING...' : 'COMMIT SOUL'}
+                  <Send className={`w-4 h-4 ${isEvaluating ? '' : 'group-hover:translate-x-1 group-hover:-translate-y-1'} transition-transform`} />
                 </button>
               </div>
             </div>
           </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-center p-8">
-            <p className="text-zinc-500 italic">Something went wrong. Let's try again!</p>
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

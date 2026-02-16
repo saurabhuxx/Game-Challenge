@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Shield } from 'lucide-react';
 import { GRID_SIZE, SNAKES, LADDERS } from '../constants';
@@ -7,9 +6,12 @@ interface BoardProps {
   currentTile: number;
   shieldActive: boolean;
   shieldTiles: number[];
+  isExpanded?: boolean;
 }
 
-const Board: React.FC<BoardProps> = ({ currentTile, shieldActive, shieldTiles }) => {
+const Board: React.FC<BoardProps> = ({ currentTile, shieldActive, shieldTiles, isExpanded = false }) => {
+  const TOTAL_ROWS = isExpanded ? 11 : 10;
+  
   const getTileCoords = (tile: number) => {
     const zeroBased = tile - 1;
     const row = Math.floor(zeroBased / GRID_SIZE);
@@ -19,13 +21,13 @@ const Board: React.FC<BoardProps> = ({ currentTile, shieldActive, shieldTiles })
     
     return {
       x: (col * 10) + 5,
-      y: 100 - ((row * 10) + 5)
+      y: (TOTAL_ROWS * 10) - ((row * 10) + 5)
     };
   };
 
   const renderTiles = () => {
     const tiles = [];
-    for (let row = GRID_SIZE - 1; row >= 0; row--) {
+    for (let row = TOTAL_ROWS - 1; row >= 0; row--) {
       for (let col = 0; col < GRID_SIZE; col++) {
         const isEvenRow = row % 2 === 0;
         let tileNumber;
@@ -72,12 +74,15 @@ const Board: React.FC<BoardProps> = ({ currentTile, shieldActive, shieldTiles })
   };
 
   return (
-    <div className="relative aspect-square w-full h-full max-w-[650px] max-h-[650px] border-[6px] border-zinc-900/80 rounded-2xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,1)] bg-zinc-950">
-      <div className="absolute inset-0 grid grid-cols-10 grid-rows-10">
+    <div 
+      className="relative w-full h-full max-w-[650px] border-[6px] border-zinc-900/80 rounded-2xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,1)] bg-zinc-950 transition-all duration-1000"
+      style={{ aspectRatio: `10 / ${TOTAL_ROWS}` }}
+    >
+      <div className="absolute inset-0 grid grid-cols-10" style={{ gridTemplateRows: `repeat(${TOTAL_ROWS}, 1fr)` }}>
         {renderTiles()}
       </div>
       
-      <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+      <svg viewBox={`0 0 100 ${TOTAL_ROWS * 10}`} className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
         <defs>
           <linearGradient id="ladder-grad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#fbbf24" />
@@ -102,12 +107,6 @@ const Board: React.FC<BoardProps> = ({ currentTile, shieldActive, shieldTiles })
             <g key={`ladder-${i}`} filter="url(#cyber-glow)" opacity="0.9">
               <line x1={start.x-1.2} y1={start.y} x2={end.x-1.2} y2={end.y} stroke="url(#ladder-grad)" strokeWidth="0.9" strokeLinecap="round" />
               <line x1={start.x+1.2} y1={start.y} x2={end.x+1.2} y2={end.y} stroke="url(#ladder-grad)" strokeWidth="0.9" strokeLinecap="round" />
-              {Array.from({length: 8}).map((_, j) => {
-                const t = (j + 1) / 9;
-                const rx = start.x + (end.x - start.x) * t;
-                const ry = start.y + (end.y - start.y) * t;
-                return <line key={j} x1={rx-1.8} y1={ry} x2={rx+1.8} y2={ry} stroke="url(#ladder-grad)" strokeWidth="0.5" />;
-              })}
             </g>
           );
         })}
@@ -128,12 +127,8 @@ const Board: React.FC<BoardProps> = ({ currentTile, shieldActive, shieldTiles })
                 stroke="url(#snake-grad)" 
                 strokeWidth="3" 
                 className="snake-path"
-                strokeLinecap="round"
               />
               <circle cx={start.x} cy={start.y} r="3" fill="#000" stroke="#ef4444" strokeWidth="0.5" />
-              <circle cx={start.x - 0.7} cy={start.y - 0.7} r="0.5" fill="#ef4444" className="animate-pulse" />
-              <circle cx={start.x + 0.7} cy={start.y - 0.7} r="0.5" fill="#ef4444" className="animate-pulse" />
-              <path d={`M ${start.x} ${start.y} L ${start.x} ${start.y - 4} L ${start.x - 1.5} ${start.y - 5.5} M ${start.x} ${start.y - 4} L ${start.x + 1.5} ${start.y - 5.5}`} stroke="#ef4444" strokeWidth="0.3" fill="none" opacity="0.8" />
             </g>
           );
         })}

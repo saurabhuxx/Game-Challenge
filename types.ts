@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -20,6 +19,13 @@ export interface KarmicEvaluation {
   feedback: string;
   karma_score: number;
   board_movement: number;
+  pragmatism: number;
+  empathy: number;
+  chaos: number;
+  // Gita Wisdom fields
+  gitaVerse: string;
+  gitaCitation: string;
+  gitaImagePrompt: string;
 }
 
 export interface TurnLog {
@@ -30,6 +36,14 @@ export interface TurnLog {
   feedback: string;
   karmaDelta: number;
   movement: number;
+  gitaVerse?: string;
+  gitaCitation?: string;
+  gitaImageUrl?: string;
+  analytics: {
+    pragmatism: number;
+    empathy: number;
+    chaos: number;
+  };
 }
 
 export interface GameState {
@@ -38,6 +52,8 @@ export interface GameState {
   history: TurnLog[];
   shieldActive: boolean;
   hasTagLifeline: boolean;
+  stamina: number;
+  isGridExpanded: boolean;
 }
 
 export interface LeaderboardEntry {
