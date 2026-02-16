@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { User, GameState, TurnLog, Dilemma, KarmicEvaluation } from './types';
 import { generateDilemma, evaluateKarma, generateGitaImage } from './services/geminiService';
-import { SHIELD_TILES } from './constants';
+import { SHIELD_TILES, MOCK_LEADERBOARD } from './constants';
 import Board from './components/Board';
 import AuditLog from './components/AuditLog';
 import LivePlayers from './components/LivePlayers';
@@ -57,7 +57,7 @@ const App: React.FC = () => {
   const typeWriterEffect = (text: string) => {
     setTypedFeedback('');
     let i = 0;
-    const speed = 40;
+    const speed = 25; // Sped up feedback typing
     const interval = setInterval(() => {
       setTypedFeedback((prev) => prev + text.charAt(i));
       i++;
@@ -68,6 +68,11 @@ const App: React.FC = () => {
   const handleSeekPath = async () => {
     const maxTile = gameState.isGridExpanded ? 110 : 100;
     if (gameState.currentTile >= maxTile) return;
+    if (gameState.stamina < 10) {
+      alert("Energy too low. Reflect on your journey to recover.");
+      return;
+    }
+
     setLastEvaluation(null);
     setGitaImageUrl(null);
     setShowDilemma(true);
@@ -91,7 +96,7 @@ const App: React.FC = () => {
       setLastEvaluation(evaluation);
       typeWriterEffect(evaluation.feedback);
       
-      // Start image generation in parallel
+      // Fast image generation
       setIsImageLoading(true);
       generateGitaImage(evaluation.gitaImagePrompt)
         .then(url => setGitaImageUrl(url))
@@ -111,10 +116,6 @@ const App: React.FC = () => {
     const evaluation = lastEvaluation;
     let movement = evaluation.board_movement;
     
-    if (gameState.stamina <= 0) {
-      movement = Math.min(0, movement); 
-    }
-
     let shieldConsumed = false;
     if (movement < 0 && gameState.shieldActive) {
       movement = 0;
@@ -132,7 +133,17 @@ const App: React.FC = () => {
 
     const isOnShieldTile = SHIELD_TILES.includes(nextTile);
 
-    let staminaDelta = evaluation.karma_score > 0 ? -20 : (evaluation.karma_score < 0 ? 10 : 0);
+    // Dynamic Energy: Virtuous acts drain energy but give massive Karma.
+    // Dishonest acts save energy but tank Karma.
+    let staminaDelta = 0;
+    if (evaluation.karma_score > 0) {
+      staminaDelta = -25; // Striving for good is hard
+    } else if (evaluation.karma_score < 0) {
+      staminaDelta = +15; // Selfishness is an easy path (temporary energy gain)
+    } else {
+      staminaDelta = -5;
+    }
+    
     const nextStamina = Math.min(Math.max(gameState.stamina + staminaDelta, 0), 100);
 
     const newLog: TurnLog = {
@@ -257,7 +268,7 @@ const App: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex flex-col items-end mr-4">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mb-1 flex items-center gap-1">
-                <Zap className="w-3 h-3 text-yellow-500" /> ENERGY
+                <Zap className={`w-3 h-3 ${gameState.stamina < 30 ? 'text-red-500 animate-pulse' : 'text-yellow-500'}`} /> ENERGY
               </span>
               <div className="w-32 h-1.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
                 <div 
@@ -299,13 +310,13 @@ const App: React.FC = () => {
             onClick={handleSeekPath}
             disabled={isDilemmaLoading || isEvaluating || gameState.currentTile >= (gameState.isGridExpanded ? 110 : 100)}
             className={`px-16 py-5 rounded-2xl font-syncopate text-sm font-bold tracking-[0.3em] transition-all flex items-center gap-4
-              ${gameState.stamina <= 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}
+              ${gameState.stamina < 10 ? 'opacity-50 grayscale cursor-not-allowed' : ''}
               ${gameState.currentTile >= (gameState.isGridExpanded ? 110 : 100) 
                 ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'
                 : 'bg-yellow-500 text-black hover:bg-yellow-400 hover:scale-[1.03] active:scale-95 shadow-[0_0_40px_rgba(234,179,8,0.4)]'
               }`}
           >
-            {gameState.stamina <= 0 ? 'EXHAUSTED' : isDilemmaLoading ? 'SEEKING...' : 'CHOOSE PATH'}
+            {gameState.stamina < 10 ? 'EXHAUSTED' : isDilemmaLoading ? 'SEEKING...' : 'CHOOSE PATH'}
             <Play className="w-4 h-4 fill-current" />
           </button>
         </footer>
@@ -360,7 +371,7 @@ const App: React.FC = () => {
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} onSubmit={() => setShowAuth(false)} />}
       {showLeaderboard && (
         <Leaderboard 
-          data={[]} currentUserId={user?.id || ''} onClose={() => setShowLeaderboard(false)}
+          data={MOCK_LEADERBOARD} currentUserId={user?.id || ''} onClose={() => setShowLeaderboard(false)}
           onProfileClick={() => {}}
         />
       )}

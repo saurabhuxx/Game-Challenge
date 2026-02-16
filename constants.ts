@@ -32,3 +32,13 @@ export const LADDERS = [
 export const SNAKES = [
   { start: 98, end: 13 }
 ];
+
+export const MOCK_LEADERBOARD = [
+  { id: 'lb_1', name: 'Arjun_99', karma: 840, city: 'Varanasi', region: 'North', virtue: 'Unshakable Honesty' },
+  { id: 'lb_2', name: 'Mithra_Sky', karma: 720, city: 'Mysuru', region: 'South', virtue: 'Selfless Service' },
+  { id: 'lb_3', name: 'Dharma_Punk', karma: 650, city: 'Rishikesh', region: 'North', vice: 'Impatience' },
+  { id: 'lb_4', name: 'Zen_Seeker', karma: 590, city: 'Gokarna', region: 'West', virtue: 'Infinite Respect' },
+  { id: 'lb_5', name: 'Veda_Grid', karma: 510, city: 'Hampi', region: 'South', virtue: 'Deep Empathy' },
+  { id: 'lb_6', name: 'Kavi_Ra', karma: 480, city: 'Pushkar', region: 'West', virtue: 'Truth Teller' },
+  { id: 'lb_7', name: 'Mira_Soul', karma: 420, city: 'Varanasi', region: 'North', virtue: 'Humble Servant' }
+];
