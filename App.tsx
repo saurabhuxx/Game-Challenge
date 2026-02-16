@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { User, GameState, TurnLog, Dilemma, KarmicEvaluation } from './types';
 import { moralEngine } from './services/geminiService';
@@ -48,10 +47,7 @@ const App: React.FC = () => {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showEndGame, setShowEndGame] = useState(false);
-  
-  const radarChartRef = useRef<HTMLCanvasElement>(null);
 
-  // Fix: Defined the missing 'archetype' variable to display the player's spiritual title on the endgame screen.
   const archetype = useMemo(() => {
     if (!user) return 'THE SEEKER';
     const k = user.totalKarma;
@@ -92,7 +88,7 @@ const App: React.FC = () => {
   const typeWriterEffect = useCallback((text: string) => {
     setTypedFeedback('');
     let i = 0;
-    const speed = 15;
+    const speed = 10; // Faster typewriter for perceived speed
     const interval = setInterval(() => {
       setTypedFeedback((prev) => prev + text.charAt(i));
       i++;
@@ -102,29 +98,43 @@ const App: React.FC = () => {
   }, []);
 
   const handleSeekPath = async () => {
-    if (gameState.stamina < 15) {
-      return;
-    }
+    if (gameState.stamina < 15) return;
+
+    const dilemmaToUse = nextDilemma || await moralEngine.generateDilemma();
     setModalState(prev => ({ 
       ...prev, 
       showDilemma: true, 
-      currentDilemma: nextDilemma, 
+      currentDilemma: dilemmaToUse, 
       lastEvaluation: null, 
       gitaImageUrl: null 
     }));
+    
+    // Always pre-warm the next one immediately
     prefetchDilemma();
   };
 
   const handleEvaluateTurn = async (response: string) => {
     if (!modalState.currentDilemma) return;
     setModalState(prev => ({ ...prev, isEvaluating: true }));
+    
     try {
+      // Step 1: Rapid Evaluation
       const evaluation = await moralEngine.evaluateChoice(modalState.currentDilemma.scenario, response);
-      setModalState(prev => ({ ...prev, lastEvaluation: evaluation, isEvaluating: false, isImageLoading: true }));
+      
+      // Step 2: Show text results immediately while image generates in background
+      setModalState(prev => ({ 
+        ...prev, 
+        lastEvaluation: evaluation, 
+        isEvaluating: false, 
+        isImageLoading: true 
+      }));
       typeWriterEffect(evaluation.feedback);
+
+      // Step 3: Trigger Image generation without blocking UI
       moralEngine.generateVerseImage(evaluation.gitaImagePrompt)
         .then(url => setModalState(prev => ({ ...prev, gitaImageUrl: url, isImageLoading: false })))
         .catch(() => setModalState(prev => ({ ...prev, isImageLoading: false })));
+        
     } catch (err) {
       setModalState(prev => ({ ...prev, isEvaluating: false }));
     }
@@ -139,7 +149,6 @@ const App: React.FC = () => {
 
     const currentMax = gameState.isGridExpanded ? 110 : 100;
     const nextTile = Math.min(Math.max(gameState.currentTile + movement, 1), currentMax);
-    
     const energyChange = lastEvaluation.karma_score > 0 ? -15 : 10;
     const nextStamina = Math.min(Math.max(gameState.stamina + energyChange, 0), 100);
 

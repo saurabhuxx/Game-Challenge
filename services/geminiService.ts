@@ -2,22 +2,19 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { Dilemma, KarmicEvaluation } from "../types";
 
 /**
- * GeminiMoralEngine - Standardized AI Service Layer
- * Optimized for high-throughput, low-latency moral reasoning.
+ * GeminiMoralEngine - Optimized for maximum throughput and minimum latency.
  */
 class GeminiMoralEngine {
   private static instance: GeminiMoralEngine;
   private ai: GoogleGenAI;
   
-  // Model Constants
   private readonly TEXT_MODEL = 'gemini-3-flash-preview';
   private readonly IMAGE_MODEL = 'gemini-2.5-flash-image';
 
   private constructor() {
-    // API Key is strictly pulled from process environment as per security protocols
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
-      throw new Error("CRITICAL: API_KEY is missing from environment variables.");
+      throw new Error("CRITICAL: API_KEY is missing.");
     }
     this.ai = new GoogleGenAI({ apiKey });
   }
@@ -30,7 +27,7 @@ class GeminiMoralEngine {
   }
 
   /**
-   * Generates a moral dilemma with minimized token output for maximum speed.
+   * Generates a moral dilemma with zero-thinking overhead for speed.
    */
   async generateDilemma(): Promise<Dilemma> {
     const themes = ['Honesty', 'Compassion', 'Justice', 'Self-Sacrifice'];
@@ -39,9 +36,10 @@ class GeminiMoralEngine {
     try {
       const response = await this.ai.models.generateContent({
         model: this.TEXT_MODEL,
-        contents: `Theme: ${theme}. Task: Create a 2-sentence human moral dilemma. No jargon.`,
+        contents: `Create a 2-sentence moral dilemma about ${theme}. No fluff.`,
         config: {
-          thinkingConfig: { thinkingBudget: 0 }, // Optimized for speed
+          systemInstruction: "You are a fast-response game engine. Output valid JSON only.",
+          thinkingConfig: { thinkingBudget: 0 },
           responseMimeType: "application/json",
           responseSchema: {
             type: Type.OBJECT,
@@ -55,82 +53,72 @@ class GeminiMoralEngine {
         }
       });
 
-      const data = JSON.parse(response.text || '{}');
-      return {
-        id: data.id || `d_${Date.now()}`,
-        scenario: data.scenario || "Fallback: You found a lost item. Do you keep it?",
-        context: data.context || "Moral Test"
-      };
+      return JSON.parse(response.text || '{}') as Dilemma;
     } catch (error) {
-      console.error("AI Dilemma Generation Error:", error);
+      console.error("Dilemma generation failed:", error);
       return {
-        id: "fallback_static",
-        scenario: "You discover a colleague making a small mistake that helps the team but violates a minor rule. Do you report it?",
-        context: "The Workplace"
+        id: "fallback",
+        scenario: "You see a mistake that benefits you but hurts the system. Report it?",
+        context: "The Choice"
       };
     }
   }
 
   /**
-   * Evaluates user response against moral benchmarks and retrieves sacred wisdom.
+   * Rapidly evaluates a choice and generates a cinematic image prompt.
    */
   async evaluateChoice(scenario: string, userChoice: string): Promise<KarmicEvaluation> {
-    // Sanitize input to prevent prompt injection or malformed strings
-    const sanitizedChoice = userChoice.substring(0, 500).replace(/[<>]/g, '');
-
     try {
       const response = await this.ai.models.generateContent({
         model: this.TEXT_MODEL,
-        contents: `Dilemma: ${scenario}\nChoice: ${sanitizedChoice}\nAnalyze morality and provide Bhagavad Gita correlation.`,
+        contents: `Scenario: ${scenario}\nChoice: ${userChoice}`,
         config: {
+          systemInstruction: "Analyze ethics and provide Gita correlation. Be concise. Output JSON.",
           thinkingConfig: { thinkingBudget: 0 },
           responseMimeType: "application/json",
           responseSchema: {
             type: Type.OBJECT,
             properties: {
-              feedback: { type: Type.STRING, description: "1-sentence moral analysis" },
-              karma_score: { type: Type.NUMBER, description: "-25 to +25 score" },
-              board_movement: { type: Type.NUMBER, description: "-5 to +5 steps" },
-              pragmatism: { type: Type.NUMBER, description: "0-10 score" },
-              empathy: { type: Type.NUMBER, description: "0-10 score" },
-              chaos: { type: Type.NUMBER, description: "0-10 score" },
+              feedback: { type: Type.STRING },
+              karma_score: { type: Type.NUMBER },
+              board_movement: { type: Type.NUMBER },
+              pragmatism: { type: Type.NUMBER },
+              empathy: { type: Type.NUMBER },
+              chaos: { type: Type.NUMBER },
               gitaVerse: { type: Type.STRING },
               gitaCitation: { type: Type.STRING },
-              gitaImagePrompt: { type: Type.STRING, description: "Prompt for an ethereal cinematic scene" }
+              gitaImagePrompt: { type: Type.STRING }
             },
             required: ["feedback", "karma_score", "board_movement", "pragmatism", "empathy", "chaos", "gitaVerse", "gitaCitation", "gitaImagePrompt"]
           }
         }
       });
 
-      return JSON.parse(response.text || '{}');
+      return JSON.parse(response.text || '{}') as KarmicEvaluation;
     } catch (error) {
-      console.error("AI Evaluation Error:", error);
-      throw new Error("Karmic reflection failed. Please try again.");
+      console.error("Evaluation failed:", error);
+      throw error;
     }
   }
 
   /**
-   * Generates a high-fidelity visual asset for the spiritual correlation.
+   * Generates a high-quality visual for the sacred verse using the fastest available model.
    */
   async generateVerseImage(scenePrompt: string): Promise<string> {
     try {
       const response = await this.ai.models.generateContent({
         model: this.IMAGE_MODEL,
-        contents: [{ parts: [{ text: `Digital art masterpiece, spiritual, cinematic lighting, Vedic aesthetics: ${scenePrompt}` }] }],
+        contents: [{ parts: [{ text: `Sacred Vedic art, cinematic glow, spiritual: ${scenePrompt}` }] }],
         config: {
           imageConfig: { aspectRatio: "16:9" }
         }
       });
 
       const part = response.candidates[0].content.parts.find(p => p.inlineData);
-      if (part?.inlineData) {
-        return `data:image/png;base64,${part.inlineData.data}`;
-      }
-      throw new Error("No image data returned.");
+      return part?.inlineData ? `data:image/png;base64,${part.inlineData.data}` : "";
     } catch (error) {
-      console.error("AI Image Generation Error:", error);
-      return ""; // Fallback to no image handled by UI
+      console.error("Image generation failed:", error);
+      return "";
     }
   }
 }
