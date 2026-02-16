@@ -33,6 +33,30 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #555;
       }
+      
+      /* Accessibility: Skip Link */
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 0;
+        background: #fbbf24;
+        color: black;
+        padding: 8px;
+        z-index: 100;
+        transition: top 0.2s;
+        font-weight: bold;
+      }
+      .skip-link:focus {
+        top: 0;
+      }
+
+      /* Accessibility: Focus Indicators */
+      :focus-visible {
+        outline: 3px solid #fbbf24;
+        outline-offset: 4px;
+        border-radius: 4px;
+      }
+
       @keyframes glow {
         0%, 100% { opacity: 0.8; }
         50% { opacity: 0.4; }
@@ -51,21 +75,13 @@
         filter: drop-shadow(0 0 8px #fbbf24);
       }
       @keyframes dash {
-        to {
-          stroke-dashoffset: -100;
-        }
+        to { stroke-dashoffset: -100; }
       }
       .text-cyber-gradient {
         background: linear-gradient(to right, #00D2FF, #FFD700, #FF4B2B);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-      }
-
-      /* Focus management for accessibility */
-      :focus-visible {
-        outline: 2px solid #fbbf24;
-        outline-offset: 4px;
       }
 
       .glitch-state {
@@ -79,6 +95,20 @@
         60% { transform: skew(-2deg); }
         80% { transform: skew(2deg); filter: blur(1px); }
         100% { transform: skew(0deg); }
+      }
+
+      /* Reduced Motion Preference */
+      @media (prefers-reduced-motion: reduce) {
+        .glitch-state, .snake-path, .animate-pulse, .animate-bounce, .animate-spin {
+          animation: none !important;
+          transition: none !important;
+        }
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
       }
     </style>
   <script type="importmap">
@@ -94,6 +124,7 @@
 </script>
 </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="root"></div>
   </body>
 </html>
