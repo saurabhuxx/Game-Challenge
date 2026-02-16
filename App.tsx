@@ -8,7 +8,8 @@ import LivePlayers from './components/LivePlayers';
 import DilemmaModal from './components/DilemmaModal';
 import AuthModal from './components/AuthModal';
 import Leaderboard from './components/Leaderboard';
-import { Trophy, User as UserIcon, Play, Zap, ArrowRight } from 'lucide-react';
+import ProfileModal from './components/ProfileModal';
+import { Trophy, User as UserIcon, Play, Zap, ArrowRight, BookOpen } from 'lucide-react';
 
 const STORAGE_KEY = 'cyber_moksha_seeker_v1';
 
@@ -46,6 +47,7 @@ const App: React.FC = () => {
   const [typedFeedback, setTypedFeedback] = useState('');
   const [showAuth, setShowAuth] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [showEndGame, setShowEndGame] = useState(false);
   const radarChartRef = useRef<HTMLCanvasElement>(null);
 
@@ -151,7 +153,7 @@ const App: React.FC = () => {
       turnNumber: gameState.turnCount + 1,
       tile: nextTile,
       dilemma: currentDilemma.scenario,
-      response: "Decisive Action", 
+      response: responseTextFromInput(lastEvaluation.feedback), // Conceptually tracking the "action"
       feedback: lastEvaluation.feedback,
       karmaDelta: lastEvaluation.karma_score,
       movement: movement,
@@ -184,6 +186,11 @@ const App: React.FC = () => {
 
     setModalState(prev => ({ ...prev, showDilemma: false }));
     if (nextTile >= currentMax) setShowEndGame(true);
+  };
+
+  const responseTextFromInput = (feedback: string) => {
+    // Helper to extract a short "Action" summary if needed, otherwise default
+    return "Decisive Action";
   };
 
   // --- ANALYTICS ---
@@ -265,8 +272,17 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <button onClick={() => setShowLeaderboard(true)} className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-yellow-500/50 transition-all group">
-              <Trophy className="w-5 h-5 text-yellow-500 group-hover:drop-shadow-[0_0_8px_gold]" />
+            <button 
+              onClick={() => setShowProfile(true)} 
+              className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-yellow-500/50 transition-all group flex items-center gap-2"
+              title="Lifetime Summary"
+            >
+              <BookOpen className="w-5 h-5 text-yellow-500 group-hover:drop-shadow-[0_0_8px_gold]" />
+              <span className="hidden md:block text-[10px] font-syncopate font-bold text-zinc-500 uppercase tracking-widest">Summary</span>
+            </button>
+
+            <button onClick={() => setShowLeaderboard(true)} className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-cyan-500/50 transition-all group">
+              <Trophy className="w-5 h-5 text-cyan-400 group-hover:drop-shadow-[0_0_8px_cyan]" />
             </button>
             <div className="flex flex-col items-end border-l border-zinc-800 pl-4">
               <span className="text-[10px] text-zinc-500 uppercase tracking-widest">Seeker</span>
@@ -351,6 +367,7 @@ const App: React.FC = () => {
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} onSubmit={() => setShowAuth(false)} />}
       {showLeaderboard && <Leaderboard data={MOCK_LEADERBOARD} currentUserId={user?.id || ''} onClose={() => setShowLeaderboard(false)} onProfileClick={() => {}} />}
+      {showProfile && user && <ProfileModal userId={user.id} userName={user.name} log={gameState.history} onClose={() => setShowProfile(false)} />}
     </div>
   );
 };

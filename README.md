@@ -24,13 +24,19 @@ Success in the path of virtue requires "effort."
 - **Selfish Choices**: Temporarily preserves or slightly restores energy, but damages long-term Karma.
 - **Low Energy**: Prevents further progression, forcing players to reflect on their journey.
 
-### 5. Soul Archetypes & Analytics
+### 5. Lifetime Summary & Profile Analytics
+Review your journey's impact through the **Summary** dashboard.
+- **Kindest Act**: Identifies the decision that yielded your highest positive Karma.
+- **Biggest Mistake**: Highlights the turning point that cost you the most Karma.
+- **Persistent Progress**: Tracks your entire playthrough history to provide a reflective look at your moral character.
+
+### 6. Soul Archetypes & Analytics
 At the end of the journey, players receive a "Soul Signature" radar chart and a final Archetype (e.g., *The Wise Guardian*, *The Compassionate Guide*) based on their cumulative choices.
 
-### 6. Dynamic Grid Expansion
+### 7. Dynamic Grid Expansion
 The path to enlightenment is not always linear. Reaching specific tiles may reveal a "New Path," expanding the board and shifting the final goal.
 
-### 7. Cyber-Mythology UI
+### 8. Cyber-Mythology UI
 A high-fidelity "Cyber-Moksha" aesthetic featuring:
 - Glitch effects for low-karma states.
 - Neon-lit game board.
@@ -69,4 +75,5 @@ This application leverages the **Google Gemini API** via the `@google/genai` SDK
 2. **Commit Soul**: Type your response to the moral challenge.
 3. **Reflect**: View your result, your Karma change, and the correlated Gita Verse.
 4. **Advance**: Move across the board, avoiding the "Snakes" of vice and climbing the "Ladders" of virtue.
-5. **Reach Moksha**: Navigate through all 100 tiles to achieve enlightenment.
+5. **View Summary**: Click the **Summary** button in the header at any time to see your lifetime highs and lows.
+6. **Reach Moksha**: Navigate through all 100 tiles to achieve enlightenment.
